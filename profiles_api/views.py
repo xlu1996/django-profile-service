@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
+from rest_framework.authentication import TokenAuthentication
 
-from profiles_api import serializers, models
+from profiles_api import serializers, models, permissions
 
 class HelloViewSet(viewsets.ViewSet):
     """Test API ViewSet"""
@@ -100,4 +101,12 @@ class HelloApiView(APIView):
 class UserProfileViewSet(viewsets.ModelViewSet):
     """Handle creating and updating profiles"""
     serializer_class = serializers.UserProfileSerializer
+
+    # Base queryset used by the viewset
     queryset = models.UserProfile.objects.all()
+
+    # Require authentication using DRF token auth
+    authentication_classes = (TokenAuthentication,)
+
+    # Apply custom object-level permission
+    permission_classes = (permissions.UpdateOwnProfile,)
