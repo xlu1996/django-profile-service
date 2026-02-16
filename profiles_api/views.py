@@ -121,3 +121,23 @@ class UserLoginApiView(ObtainAuthToken):
     """Handle creating user authentication tokens"""
 
     rederer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+
+class UserProfileFeedViewSet(viewsets.ModelViewSet):
+    """Handles creating, reading and updating profile feed items"""
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.ProfileFeedItemSerializer
+    queryset = models.ProfileFeedItem.objects.all()
+
+    def perform_create(self, serializer):
+        """Sets the user profile to the logged in user"""
+
+        # user_profile is read-only in the serializer,
+        # so the client cannot send or modify this field.
+
+        # The model still requires user_profile,
+        # therefore the server must supply it.
+
+        # perform_create runs right before the object is saved,
+        # allowing us to attach additional data safely.
+        serializer.save(user_profile=self.request.user)
